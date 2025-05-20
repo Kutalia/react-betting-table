@@ -18,3 +18,5 @@ Tried compression, but it came with another challenge - correctly storing and re
 `npm run dev` to run a dev server
 
 `npm run build` to bundle the project
+
+`npm run lint` to check for lint errors

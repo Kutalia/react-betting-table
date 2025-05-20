@@ -50,8 +50,8 @@ export const MatchesTable = () => {
       <Column {...columnProps} width={50} label="1" dataKey="odd1" />
       <Column {...columnProps} width={50} label="x" dataKey="oddX" />
       <Column {...columnProps} width={50} label="2" dataKey="odd2" />
-      <Column {...columnProps} width={50} label="1x" dataKey="odd1x" />
-      <Column {...columnProps} width={50} label="2x" dataKey="odd2x" />
+      <Column {...columnProps} width={50} label="1X" dataKey="odd1X" />
+      <Column {...columnProps} width={50} label="2X" dataKey="odd2X" />
       <Column {...columnProps} width={50} label="score" dataKey="score" />
     </Table>}
   </AutoSizer>
