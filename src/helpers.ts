@@ -97,4 +97,11 @@ export const generateMixedMatches = (amount: number = NUMBER_OF_MATCHES) => [
   ...generateMatches('soccer', amount % 4),
 ]
 
-export const dateTimeFormat = new Intl.DateTimeFormat('en-US')
+export const dateTimeFormat = new Intl.DateTimeFormat('en-US', {
+  hour12: true,
+  minute: '2-digit',
+  hour: '2-digit',
+  day: 'numeric',
+  month: 'numeric',
+  year: 'numeric',
+})

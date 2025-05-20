@@ -42,9 +42,9 @@ export const MatchesTable = () => {
       rowClassName="flex"
       rowGetter={({ index }) => matches[index]}
     >
-      {/* There seems to be a bug where width doesn't change anything but the prop is still needed */}
+      {/* There seems to be a bug where `width` prop doesn't change anything but it's still needed */}
       <Column {...columnProps} className="!w-16 p-1" headerClassName="!w-16" width={200} label="Sport" dataKey="sport" />
-      <Column {...columnProps} width={200} label="Start Date" dataKey="startDateTime" />
+      <Column {...columnProps} className="!w-48" headerClassName="!w-48" width={200} label="Start Time" dataKey="startDateTime" />
       <Column {...columnProps} headerClassName="!w-64" className="!w-64 truncate" width={100} label="Home Team" dataKey="teamHome" />
       <Column {...columnProps} headerClassName="!w-64" className="!w-64 truncate" width={100} label="Away Team" dataKey="teamAway" />
       <Column {...columnProps} width={50} label="1" dataKey="odd1" />
