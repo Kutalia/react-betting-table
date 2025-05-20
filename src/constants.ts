@@ -1,6 +1,6 @@
 import type { Sport } from "./types"
 
-export const NUMBER_OF_MATCHES = 10
+export const NUMBER_OF_MATCHES = 100
 export const AVERAGE_SCORE_BY_SPORT: Record<Sport, number> = {
   soccer: 1.36,
   basketball: 107.4,

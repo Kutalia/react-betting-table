@@ -38,14 +38,15 @@ export const MatchesTable = () => {
       rowCount={matches.length}
       rowHeight={30}
       headerHeight={35}
-      headerClassName="w-24"
+      headerClassName="w-24 font-bold"
       rowClassName="flex"
       rowGetter={({ index }) => matches[index]}
     >
-      <Column {...columnProps} width={200} label="Sport" dataKey="sport" />
+      {/* There seems to be a bug where width doesn't change anything but the prop is still needed */}
+      <Column {...columnProps} className="!w-16 p-1" headerClassName="!w-16" width={200} label="Sport" dataKey="sport" />
       <Column {...columnProps} width={200} label="Start Date" dataKey="startDateTime" />
-      <Column {...columnProps} width={100} label="Home Team" dataKey="teamHome" />
-      <Column {...columnProps} width={100} label="Away Team" dataKey="teamAway" />
+      <Column {...columnProps} headerClassName="!w-64" className="!w-64 truncate" width={100} label="Home Team" dataKey="teamHome" />
+      <Column {...columnProps} headerClassName="!w-64" className="!w-64 truncate" width={100} label="Away Team" dataKey="teamAway" />
       <Column {...columnProps} width={50} label="1" dataKey="odd1" />
       <Column {...columnProps} width={50} label="x" dataKey="oddX" />
       <Column {...columnProps} width={50} label="2" dataKey="odd2" />
