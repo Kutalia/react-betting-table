@@ -1,8 +1,8 @@
-import { useCallback, useMemo } from 'react';
-import { AutoSizer, Column, defaultTableCellRenderer, defaultTableHeaderRenderer, Table, type TableCellDataGetter, type TableCellRenderer } from 'react-virtualized';
+import { useCallback, useMemo, useState } from 'react';
+import { AutoSizer, Column, defaultTableCellRenderer, defaultTableHeaderRenderer, Table, type ScrollEventData, type ScrollParams, type TableCellDataGetter, type TableCellRenderer } from 'react-virtualized';
 
 import { defaultCellDataGetter } from 'react-virtualized/dist/es/Table';
-import { dateTimeFormat, updateOddsInStore } from '../helpers';
+import { dateTimeFormat, retrieveScrollPosition, saveScrollPosition, updateOddsInStore } from '../helpers';
 import { useMatches } from '../hooks/useMatches';
 import { useMockedWsServer } from '../hooks/useMockedWsServer';
 import type { Match, OddsChangeEventDetailType } from '../types';
@@ -53,6 +53,20 @@ export const MatchesTable = () => {
     className: 'w-24',
   }), [cellDataGetter, cellRenderer])
 
+  const [scrollTop, setScrollTop] = useState(retrieveScrollPosition)
+  const [isRendered, setIsRendered] = useState(false)
+
+  const handleScroll = useCallback((e: ScrollParams | ScrollEventData) => {
+    // Don't save values until rendering is done
+    // That is because during this time table will keep firing scroll events with 0 scrollTop value
+    if (!isRendered) {
+      return
+    }
+
+    saveScrollPosition(e.scrollTop)
+    setScrollTop(e.scrollTop)
+  }, [isRendered])
+
   return <AutoSizer>
     {({ height, width }) => <Table
       columnWidth={100}
@@ -65,6 +79,9 @@ export const MatchesTable = () => {
       rowClassName="flex"
       rowGetter={({ index }) => matches[index]}
       sortBy="id" // I think this one's glitched too
+      onScroll={handleScroll}
+      scrollTop={scrollTop}
+      onRowsRendered={() => setIsRendered(true)}
     >
       {/* There seems to be a bug where `width` prop doesn't change anything but it's still needed */}
       <Column {...columnProps} className="!w-16 p-1" headerClassName="!w-16" width={200} label="Sport" dataKey="sport" />

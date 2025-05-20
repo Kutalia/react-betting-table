@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
 import { openDB } from 'idb'
-import { AVERAGE_SCORE_BY_SPORT, DB_NAME, NUMBER_OF_MATCHES, SCORE_DEVIATION_MULTIPLIER, STORE_NAME } from './constants'
+import { AVERAGE_SCORE_BY_SPORT, DB_NAME, NUMBER_OF_MATCHES, SCORE_DEVIATION_MULTIPLIER, SCROLL_POSITION_STORE_KEY, STORE_NAME } from './constants'
 import mlbClubs from './data/clubs.mlb.json'
 import nbaClubs from './data/clubs.nba.json'
 import nflClubs from './data/clubs.nfl.json'
@@ -177,4 +177,13 @@ export const updateOddsInStore = async (newOdds: ChangedOdds, id: string) => {
 
     break
   }
+}
+
+export const saveScrollPosition = (scrollTop: number) => {
+  localStorage.setItem(SCROLL_POSITION_STORE_KEY, String(scrollTop))
+}
+
+export const retrieveScrollPosition = () => {
+  const scrollTop = localStorage.getItem(SCROLL_POSITION_STORE_KEY)
+  return typeof scrollTop == null ? 0 : Number(scrollTop)
 }
