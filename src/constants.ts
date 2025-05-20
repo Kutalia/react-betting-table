@@ -1,6 +1,6 @@
 import type { Sport } from "./types"
 
-export const NUMBER_OF_MATCHES = 4_000
+export const NUMBER_OF_MATCHES = 10
 export const AVERAGE_SCORE_BY_SPORT: Record<Sport, number> = {
   soccer: 1.36,
   basketball: 107.4,
@@ -12,3 +12,6 @@ export const SCORE_DEVIATION_MULTIPLIER = 2
 
 export const DB_NAME = 'Matches'
 export const STORE_NAME = 'matches'
+
+export const ODDS_CHANGE_EVENT = 'odds_changed'
+export const ODDS_CHANGE_INTERVAL = 4000

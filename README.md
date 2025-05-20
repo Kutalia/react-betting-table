@@ -1,6 +1,6 @@
 # React Betting Table
 
-Render a scalable table containing odds about randomly generated matches. Odds keep changing using a mock WebSocket server.
+Render a scalable table containing odds about randomly generated matches. Odds keep changing using a loosely mocked WebSocket server based on EventTarget.
 
 Based on [React-Virtualized](https://github.com/bvaughn/react-virtualized)
 

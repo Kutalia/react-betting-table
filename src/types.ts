@@ -34,3 +34,7 @@ export interface DB extends DBSchema {
     value: Match
   }
 }
+export interface OddsChangeEventDetailType {
+  changedOdds: ChangedOdds
+  id: string
+}

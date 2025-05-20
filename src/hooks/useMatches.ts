@@ -2,8 +2,7 @@ import { useEffect, useState } from "react"
 import type { Match } from "../types"
 import { createStore } from "../helpers"
 
-
-export const useMatches = () => {
+export const useMatches = (): [Match[], React.Dispatch<React.SetStateAction<Match[]>>] => {
   const [matches, setMatches] = useState<Match[]>([])
   
   useEffect(() => {
@@ -11,5 +10,5 @@ export const useMatches = () => {
     matchesPromise.then(setMatches)
   }, [])
 
-  return matches
+  return [matches, setMatches]
 }

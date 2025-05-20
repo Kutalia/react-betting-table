@@ -2,11 +2,29 @@ import { useCallback, useMemo } from 'react';
 import { AutoSizer, Column, defaultTableCellRenderer, defaultTableHeaderRenderer, Table, type TableCellDataGetter, type TableCellRenderer } from 'react-virtualized';
 
 import { defaultCellDataGetter } from 'react-virtualized/dist/es/Table';
-import { dateTimeFormat } from '../helpers';
+import { dateTimeFormat, updateOddsInStore } from '../helpers';
 import { useMatches } from '../hooks/useMatches';
+import { useMockedWsServer } from '../hooks/useMockedWsServer';
+import type { Match, OddsChangeEventDetailType } from '../types';
 
 export const MatchesTable = () => {
-  const matches = useMatches()
+  const [matches, setMatches] = useMatches()
+
+  const onOddsChange = useCallback(({ changedOdds, id }: OddsChangeEventDetailType) => {
+    updateOddsInStore(changedOdds, id).then(() => {
+      setMatches((prevMatches) => [
+        ...(prevMatches.filter((m) => m.id !== id)),
+        { ...prevMatches.find((m) => m.id === id) as Match, ...changedOdds }
+      ])
+    })
+  }, [])
+
+  const matchIds = useMemo(() => matches.map(({ id }) => id), [matches.length])
+
+  useMockedWsServer({
+    onOddsChange,
+    matchIds,
+  })
 
   const cellDataGetter = useCallback<TableCellDataGetter>((params) => {
     switch (params.dataKey) {
@@ -41,6 +59,7 @@ export const MatchesTable = () => {
       headerClassName="w-24 font-bold"
       rowClassName="flex"
       rowGetter={({ index }) => matches[index]}
+      sortBy="id"
     >
       {/* There seems to be a bug where `width` prop doesn't change anything but it's still needed */}
       <Column {...columnProps} className="!w-16 p-1" headerClassName="!w-16" width={200} label="Sport" dataKey="sport" />

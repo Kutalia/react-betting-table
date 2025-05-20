@@ -21,11 +21,18 @@ export const getClubs = (type: Sport): string[] => {
   }
 }
 
-function getRandomItem<T>(arr: T[]): T {
+export function getRandomItem<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
 const getOdd = (chance: number) => Number((1 / chance).toFixed(2))
+
+export const generateChances = () => {
+  const winChanceHome = Math.random()
+  const drawChance = Math.random() * (1 - winChanceHome)
+
+  return [drawChance, winChanceHome]
+}
 
 export const generateOdds = (_winChanceHome?: number, _drawChance?: number): Odds | ChangedOdds => {
   const isOddsChange = typeof _winChanceHome === 'number' && typeof _drawChance === 'number'
@@ -35,22 +42,22 @@ export const generateOdds = (_winChanceHome?: number, _drawChance?: number): Odd
   }
 
   let drawChance = _drawChance
+  let winChanceHome = _winChanceHome
 
-  const winChanceHome = typeof _winChanceHome === 'number' ? _winChanceHome : Math.random()
-  while (true) {
-    drawChance = Math.random()
-    if (drawChance < winChanceHome && drawChance + winChanceHome < 1) {
-      break
-    }
+  if (typeof drawChance !== 'number' || typeof winChanceHome !== 'number') {
+    const chances = generateChances()
+    drawChance = chances[0]
+    winChanceHome = chances[1]
   }
+
   const winChanceAway = 1 - winChanceHome - drawChance
 
   return {
-    [isOddsChange ? 'odd1Change' : 'odd1']: getOdd(winChanceHome),
-    [isOddsChange ? 'oddXChange' : 'oddX']: getOdd(drawChance),
-    [isOddsChange ? 'odd2Change' : 'odd2']: getOdd(winChanceAway),
-    [isOddsChange ? 'odd1XChange' : 'odd1X']: getOdd(winChanceHome + drawChance),
-    [isOddsChange ? 'odd2XChange' : 'odd2X']: getOdd(winChanceAway + drawChance),
+    [isOddsChange ? 'odd1Changed' : 'odd1']: getOdd(winChanceHome),
+    [isOddsChange ? 'oddXChanged' : 'oddX']: getOdd(drawChance),
+    [isOddsChange ? 'odd2Changed' : 'odd2']: getOdd(winChanceAway),
+    [isOddsChange ? 'odd1XChanged' : 'odd1X']: getOdd(winChanceHome + drawChance),
+    [isOddsChange ? 'odd2XChanged' : 'odd2X']: getOdd(winChanceAway + drawChance),
   } as unknown as Odds | ChangedOdds
 }
 
@@ -81,6 +88,8 @@ export const generateMatches = (sport: Sport, amount: number) => {
       }
     }
 
+    const odds = generateOdds() as Odds
+
     matches.push({
       id: uuidv4(),
       sport,
@@ -90,11 +99,11 @@ export const generateMatches = (sport: Sport, amount: number) => {
       ...(generateOdds() as Odds),
       scoreHome: generateTeamScore(sport),
       scoreAway: generateTeamScore(sport),
-      odd1Changed: 0,
-      oddXChanged: 0,
-      odd2Changed: 0,
-      odd1XChanged: 0,
-      odd2XChanged: 0,
+      odd1Changed: odds.odd1, // Describes that initially there's no change
+      oddXChanged: odds.oddX,
+      odd2Changed: odds.odd2,
+      odd1XChanged: odds.odd1X,
+      odd2XChanged: odds.odd2X,
     })
   }
 
@@ -118,6 +127,8 @@ export const dateTimeFormat = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
 })
 
+// Creates store and returns matches
+// Skips creation if a store already exists
 export const createStore = async () => {
   const db = await openDB<DB>(DB_NAME, 1, {
     async upgrade(db) {
@@ -146,11 +157,7 @@ export const createStore = async () => {
   return matches
 }
 
-export const updateOddsInStore = async (winChanceHome: number, drawChance: number, id: string) => {
-  if (winChanceHome + drawChance > 1) {
-    return
-  }
-
+export const updateOddsInStore = async (newOdds: ChangedOdds, id: string) => {
   const db = await openDB<DB>(DB_NAME, 1)
   const tx = db.transaction(STORE_NAME, 'readwrite')
   let match: Match
@@ -160,9 +167,7 @@ export const updateOddsInStore = async (winChanceHome: number, drawChance: numbe
     if (match.id !== id) {
       continue
     }
-    
-    const newOdds: ChangedOdds = generateOdds(winChanceHome, drawChance) as ChangedOdds
-    
+
     await Promise.all([
       tx.store.put({ ...match, ...newOdds }),
       tx.done,
