@@ -12,10 +12,15 @@ export const MatchesTable = () => {
 
   const onOddsChange = useCallback(({ changedOdds, id }: OddsChangeEventDetailType) => {
     updateOddsInStore(changedOdds, id).then(() => {
-      setMatches((prevMatches) => [
-        ...(prevMatches.filter((m) => m.id !== id)),
-        { ...prevMatches.find((m) => m.id === id) as Match, ...changedOdds }
-      ])
+      setMatches((prevMatches) => {
+        const newMatches = [...prevMatches]
+        newMatches.splice(
+          prevMatches.findIndex((m) => m.id === id),
+          1,
+          { ...prevMatches.find((m) => m.id === id) as Match, ...changedOdds }
+        )
+        return newMatches
+      })
     })
   }, [])
 
@@ -59,7 +64,7 @@ export const MatchesTable = () => {
       headerClassName="w-24 font-bold"
       rowClassName="flex"
       rowGetter={({ index }) => matches[index]}
-      sortBy="id"
+      sortBy="id" // I think this one's glitched too
     >
       {/* There seems to be a bug where `width` prop doesn't change anything but it's still needed */}
       <Column {...columnProps} className="!w-16 p-1" headerClassName="!w-16" width={200} label="Sport" dataKey="sport" />

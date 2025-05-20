@@ -14,6 +14,10 @@ Storing JSON in Localstorage has been tried as an alternative, but it has very l
 
 Tried compression, but it came with another challenge - correctly storing and retrieving UTF-8 data (it is the most used format in compression algorithms) in UTF-16 format that is required by Localstorage. So the idea was scrapped
 
+It's worth noting the code is really unoptimized for big data in favor of retaining immutability and declarative programming widely used in React ecosystem
+
+In the perfect scenario I would recommend using refs for storing data and directly manipulating it. Then generate a hash for each operation to force updating components through useState
+
 ## Running
 `npm run dev` to run a dev server
 
