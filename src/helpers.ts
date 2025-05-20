@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import { AVERAGE_SCORE_BY_SPORT, NUMBER_OF_MATCHES, SCORE_DEVIATION_MULTIPLIER } from './constants'
+import { openDB } from 'idb'
+import { AVERAGE_SCORE_BY_SPORT, DB_NAME, NUMBER_OF_MATCHES, SCORE_DEVIATION_MULTIPLIER, STORE_NAME } from './constants'
 import mlbClubs from './data/clubs.mlb.json'
 import nbaClubs from './data/clubs.nba.json'
 import nflClubs from './data/clubs.nfl.json'
 import soccerClubs from './data/clubs.soccer.json'
-import type { Match, Sport } from './types'
+import type { DB, Match, Sport } from './types'
 
 export const getClubs = (type: Sport): string[] => {
   switch (type) {
@@ -105,3 +106,35 @@ export const dateTimeFormat = new Intl.DateTimeFormat('en-US', {
   month: 'numeric',
   year: 'numeric',
 })
+
+export const createStore = async () => {
+  const db = await openDB<DB>(DB_NAME, 1, {
+    async upgrade(db) {
+      const matches = generateMixedMatches(NUMBER_OF_MATCHES)
+      const objectStore = db.createObjectStore(STORE_NAME, {
+        keyPath: "id",
+      })
+
+      for (const key in matches[0]) {
+        // @ts-ignore
+        objectStore.createIndex(key, key, { unique: false })
+      }
+
+      await Promise.all([
+        ...matches.map((match) => objectStore.add(match)),
+      ])
+    }
+  })
+
+  const tx = db.transaction(STORE_NAME)
+
+  const matches = await tx.store.getAll()
+
+  db.close()
+
+  return matches
+}
+
+const updateOddsInStore = (chanceWin: number, chanceDraw: number, id: string) => {
+
+}

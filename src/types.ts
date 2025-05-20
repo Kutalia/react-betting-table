@@ -1,3 +1,5 @@
+import type { DBSchema } from "idb"
+
 export type Sport = 'baseball' | 'basketball' | 'football' | 'soccer'
 
 export interface Match {
@@ -13,4 +15,11 @@ export interface Match {
   odd2x: number
   scoreHome: number
   scoreAway: number
+}
+
+export interface DB extends DBSchema {
+  'matches': {
+    key: Match['id']
+    value: Match
+  }
 }

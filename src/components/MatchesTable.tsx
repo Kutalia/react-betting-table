@@ -2,8 +2,8 @@ import { useCallback, useMemo } from 'react';
 import { AutoSizer, Column, defaultTableCellRenderer, defaultTableHeaderRenderer, Table, type TableCellDataGetter, type TableCellRenderer } from 'react-virtualized';
 
 import { defaultCellDataGetter } from 'react-virtualized/dist/es/Table';
-import { useMatches } from '../hooks/useMatches';
 import { dateTimeFormat } from '../helpers';
+import { useMatches } from '../hooks/useMatches';
 
 export const MatchesTable = () => {
   const matches = useMatches()
