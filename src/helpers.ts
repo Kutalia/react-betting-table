@@ -137,25 +137,27 @@ export const createStore = async () => {
         const objectStore = db.createObjectStore(STORE_NAME, {
           keyPath: "id",
         })
-  
+
         for (const key in matches[0]) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           objectStore.createIndex(key, key, { unique: false })
         }
-  
+
         await Promise.all([
           ...matches.map((match) => objectStore.add(match)),
         ])
       }
     })
-  
+
     const tx = db.transaction(STORE_NAME)
-  
+
     const matches = await tx.store.getAll()
-  
+
     db.close()
 
     return matches
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     return []
   }
@@ -166,22 +168,23 @@ export const updateOddsInStore = async (newOdds: ChangedOdds, id: string) => {
   try {
     const tx = db.transaction(STORE_NAME, 'readwrite')
     let match: Match
-  
+
     for await (const cursor of tx.store) {
       match = cursor.value
       if (match.id !== id) {
         continue
       }
-  
+
       await Promise.all([
         tx.store.put({ ...match, ...newOdds }),
         tx.done,
       ])
-  
+
       db.close()
-  
+
       break
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     db.close()
   }
@@ -193,7 +196,7 @@ export const saveScrollPosition = (scrollTop: number) => {
 
 export const retrieveScrollPosition = () => {
   const scrollTop = localStorage.getItem(SCROLL_POSITION_STORE_KEY)
-  return typeof scrollTop == null ? 0 : Number(scrollTop)
+  return scrollTop == null ? 0 : Number(scrollTop)
 }
 
 const percentFormat = new Intl.NumberFormat('en-US', {

@@ -25,8 +25,9 @@ export const MatchesTable = () => {
         return newMatches
       })
     })
-  }, [])
+  }, [setMatches])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const matchIds = useMemo(() => matches.map(({ id }) => id), [matches.length])
 
   useMockedWsServer({

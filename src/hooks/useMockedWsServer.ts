@@ -6,7 +6,6 @@ import type { ChangedOdds, Match, OddsChangeEventDetailType } from "../types"
 import { generateChances, generateOdds, getRandomItem } from "../helpers"
 
 interface Params {
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
   onOddsChange: (event: OddsChangeEventDetailType) => void
   matchIds: Array<Match['id']>
 }
@@ -22,7 +21,7 @@ export const useMockedWsServer = ({ onOddsChange, matchIds }: Params) => {
     mockedWs.addEventListener(ODDS_CHANGE_EVENT, listener)
 
     return () => removeEventListener(ODDS_CHANGE_EVENT, listener)
-  }, [onOddsChange])
+  }, [onOddsChange, mockedWs])
 
   useEffect(function createInterval() {
     if (!matchIds.length) {
@@ -45,5 +44,5 @@ export const useMockedWsServer = ({ onOddsChange, matchIds }: Params) => {
     }, ODDS_CHANGE_INTERVAL)
 
     return () => clearInterval(interval)
-  }, [matchIds])
+  }, [matchIds, mockedWs])
 }
