@@ -1,3 +1,5 @@
+## [Live demo](https://react-betting-table.vercel.app/)
+
 # React Betting Table
 
 Renders a scalable table containing odds about randomly generated matches. Odds keep changing using a loosely mocked WebSocket server based on EventTarget
