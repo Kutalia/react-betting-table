@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { AutoSizer, Column, defaultTableCellRenderer, defaultTableHeaderRenderer, Table, type ScrollEventData, type ScrollParams, type TableCellDataGetter, type TableCellRenderer } from 'react-virtualized';
 
 import { defaultCellDataGetter } from 'react-virtualized/dist/es/Table';
-import { dateTimeFormat, retrieveScrollPosition, saveScrollPosition, updateOddsInStore } from '../helpers';
+import { dateTimeFormat, formatToPercent, retrieveScrollPosition, saveScrollPosition, updateOddsInStore } from '../helpers';
 import { useMatches } from '../hooks/useMatches';
 import { useMockedWsServer } from '../hooks/useMockedWsServer';
 import type { Match, OddsChangeEventDetailType } from '../types';
@@ -42,6 +42,28 @@ export const MatchesTable = () => {
   const cellRenderer = useCallback<TableCellRenderer>((props) => {
     switch (props.dataKey) {
       case 'sport': return <img src={new URL(`../assets/${props.rowData.sport}.svg`, import.meta.url).href} className="h-full" />
+      case 'odd1':
+      case 'oddX':
+      case 'odd2':
+      case 'odd1X':
+      case 'odd2X': {
+        const odd = props.cellData
+        const changedOdd: number = props.rowData[`${props.dataKey}Changed`]
+
+        if (changedOdd === odd) {
+          return defaultTableCellRenderer(props)
+        }
+
+        const change = (changedOdd - odd) / odd
+        const changePercentStr = formatToPercent(change)
+
+        return <div className="pr-4">
+          <div className={`flex gap-4 px-1`} style={{ backgroundColor: change > 0 ? '#24b548cf' : '#e67e8ecf' }}>
+            <p className="w-full" title={String(changedOdd)}>{changedOdd}</p>
+            <p className="w-full" title={changePercentStr}>{changePercentStr}</p>
+          </div>
+        </div>
+      }
       default: return defaultTableCellRenderer(props)
     }
   }, [])
@@ -50,7 +72,7 @@ export const MatchesTable = () => {
     headerRenderer: defaultTableHeaderRenderer,
     cellDataGetter,
     cellRenderer,
-    className: 'w-24',
+    className: 'w-38',
   }), [cellDataGetter, cellRenderer])
 
   const [scrollTop, setScrollTop] = useState(retrieveScrollPosition)
@@ -75,7 +97,7 @@ export const MatchesTable = () => {
       rowCount={matches.length}
       rowHeight={30}
       headerHeight={35}
-      headerClassName="w-24 font-bold"
+      headerClassName="w-38 font-bold"
       rowClassName="flex"
       rowGetter={({ index }) => matches[index]}
       sortBy="id" // I think this one's glitched too

@@ -96,9 +96,9 @@ export const generateMatches = (sport: Sport, amount: number) => {
       startDateTime,
       teamHome,
       teamAway,
-      ...(generateOdds() as Odds),
       scoreHome: generateTeamScore(sport),
       scoreAway: generateTeamScore(sport),
+      ...odds,
       odd1Changed: odds.odd1, // Describes that initially there's no change
       oddXChanged: odds.oddX,
       odd2Changed: odds.odd2,
@@ -187,3 +187,10 @@ export const retrieveScrollPosition = () => {
   const scrollTop = localStorage.getItem(SCROLL_POSITION_STORE_KEY)
   return typeof scrollTop == null ? 0 : Number(scrollTop)
 }
+
+const percentFormat = new Intl.NumberFormat('en-US', {
+  style: 'percent',
+  maximumFractionDigits: 2,
+})
+
+export const formatToPercent = (num: number) => percentFormat.format(num)
