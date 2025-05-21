@@ -8,6 +8,10 @@ Additionally, users are able to select odds. Only single odd type selection is a
 
 All data is persisted during page refresh thanks to IndexedDB and Localstorage
 
+**Please clear your `localStorage` and `IndexedDb` thoroughly if you'd like to regenerate data**
+
+*`IndexedDb` will keep recreating store before you are able to refresh the page after cleaning storage, so try increasing `ODDS_CHANGE_INTERVAL` in `constants.ts` or clearing storage again after refresh, then do the final page reload*
+
 ## Used technologies worth mentioning
 
 Based on [React-Virtualized](https://github.com/bvaughn/react-virtualized)

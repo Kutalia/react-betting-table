@@ -55,10 +55,6 @@ export const MatchesTable = () => {
         const odd = props.cellData
         const changedOdd: number = props.rowData[`${props.dataKey}Changed`]
 
-        if (changedOdd === odd) {
-          return defaultTableCellRenderer(props)
-        }
-
         const change = (changedOdd - odd) / odd
         const changePercentStr = formatToPercent(change)
 
@@ -68,13 +64,17 @@ export const MatchesTable = () => {
           <div
             className={`flex items-center gap-4 px-1 cursor-pointer hover:!bg-sky-400 transition-colors duration-200`}
             style={{
-              backgroundColor: change > 0 ? '#24b548cf' : '#e67e8ecf',
+              ...(changedOdd !== odd ? { backgroundColor: change > 0 ? '#24b548cf' : '#e67e8ecf' } : {}),
               border: `${selectedOdd === props.dataKey ? '3px solid black' : 'none'}`
             }}
             onClick={() => handleOddClick(props.rowData.id, props.dataKey as keyof Odds)}
           >
             <p className="w-full" title={String(changedOdd)}>{changedOdd}</p>
-            <p className="w-full text-xs" title={changePercentStr}>{changePercentStr}</p>
+            {changedOdd !== odd
+              && <p className="w-full text-xs" title={changePercentStr}>
+                {changePercentStr}
+              </p>
+            }
           </div>
         </div>
       }

@@ -130,52 +130,60 @@ export const dateTimeFormat = new Intl.DateTimeFormat('en-US', {
 // Creates store and returns matches
 // Skips creation if a store already exists
 export const createStore = async () => {
-  const db = await openDB<DB>(DB_NAME, 1, {
-    async upgrade(db) {
-      const matches = generateMixedMatches(NUMBER_OF_MATCHES)
-      const objectStore = db.createObjectStore(STORE_NAME, {
-        keyPath: "id",
-      })
-
-      for (const key in matches[0]) {
-        // @ts-ignore
-        objectStore.createIndex(key, key, { unique: false })
+  try {
+    const db = await openDB<DB>(DB_NAME, 1, {
+      async upgrade(db) {
+        const matches = generateMixedMatches(NUMBER_OF_MATCHES)
+        const objectStore = db.createObjectStore(STORE_NAME, {
+          keyPath: "id",
+        })
+  
+        for (const key in matches[0]) {
+          // @ts-ignore
+          objectStore.createIndex(key, key, { unique: false })
+        }
+  
+        await Promise.all([
+          ...matches.map((match) => objectStore.add(match)),
+        ])
       }
+    })
+  
+    const tx = db.transaction(STORE_NAME)
+  
+    const matches = await tx.store.getAll()
+  
+    db.close()
 
-      await Promise.all([
-        ...matches.map((match) => objectStore.add(match)),
-      ])
-    }
-  })
-
-  const tx = db.transaction(STORE_NAME)
-
-  const matches = await tx.store.getAll()
-
-  db.close()
-
-  return matches
+    return matches
+  } catch (err) {
+    return []
+  }
 }
 
 export const updateOddsInStore = async (newOdds: ChangedOdds, id: string) => {
   const db = await openDB<DB>(DB_NAME, 1)
-  const tx = db.transaction(STORE_NAME, 'readwrite')
-  let match: Match
-
-  for await (const cursor of tx.store) {
-    match = cursor.value
-    if (match.id !== id) {
-      continue
+  try {
+    const tx = db.transaction(STORE_NAME, 'readwrite')
+    let match: Match
+  
+    for await (const cursor of tx.store) {
+      match = cursor.value
+      if (match.id !== id) {
+        continue
+      }
+  
+      await Promise.all([
+        tx.store.put({ ...match, ...newOdds }),
+        tx.done,
+      ])
+  
+      db.close()
+  
+      break
     }
-
-    await Promise.all([
-      tx.store.put({ ...match, ...newOdds }),
-      tx.done,
-    ])
-
+  } catch (err) {
     db.close()
-
-    break
   }
 }
 
