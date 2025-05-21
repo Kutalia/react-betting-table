@@ -6,9 +6,10 @@ import { dateTimeFormat, formatToPercent, retrieveScrollPosition, retrieveSelect
 import { useMatches } from '../hooks/useMatches';
 import { useMockedWsServer } from '../hooks/useMockedWsServer';
 import type { Match, Odds, OddsChangeEventDetailType } from '../types';
+import { Loader } from './Loader/Loader';
 
 export const MatchesTable = () => {
-  const [matches, setMatches] = useMatches()
+  const { matches, setMatches, loading } = useMatches()
 
   const [selectedOdds, setSelectedOdds] = useState(retrieveSelectedOdds)
 
@@ -101,6 +102,10 @@ export const MatchesTable = () => {
     saveScrollPosition(e.scrollTop)
     setScrollTop(e.scrollTop)
   }, [isRendered])
+
+  if (loading) {
+    return <Loader />
+  }
 
   return <AutoSizer>
     {({ height, width }) => <Table

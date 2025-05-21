@@ -217,3 +217,5 @@ export const saveSelectedOdd = (id: string, oddType: keyof Odds) => {
 
   return newOdds
 }
+
+export const removeSelectedOdds = () => localStorage.removeItem(SELECTED_ODDS_STORE_KEY)
