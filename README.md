@@ -32,6 +32,8 @@ It's worth noting the code is really unoptimized for big data in favor of retain
 
 In the perfect scenario I would recommend using refs for storing data and directly manipulating it. Then generate a hash for each operation to force updating components through useState
 
+Even though the table is virtualized, if you scroll really fast, blank rows will appear until fully rendered
+
 ## Running
 `npm run dev` to run a dev server
 

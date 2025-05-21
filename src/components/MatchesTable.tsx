@@ -122,6 +122,7 @@ export const MatchesTable = () => {
       onScroll={handleScroll}
       scrollTop={scrollTop}
       onRowsRendered={() => setIsRendered(true)}
+      overscanRowCount={100} // Ensures data appears correctly when scrolling with a middle mouse button
     >
       {/* There seems to be a bug where `width` prop doesn't change anything but it's still needed */}
       <Column {...columnProps} className="!w-16 p-1" headerClassName="!w-16" width={200} label="Sport" dataKey="sport" />
