@@ -2,13 +2,15 @@ import { useCallback, useMemo, useState } from 'react';
 import { AutoSizer, Column, defaultTableCellRenderer, defaultTableHeaderRenderer, Table, type ScrollEventData, type ScrollParams, type TableCellDataGetter, type TableCellRenderer } from 'react-virtualized';
 
 import { defaultCellDataGetter } from 'react-virtualized/dist/es/Table';
-import { dateTimeFormat, formatToPercent, retrieveScrollPosition, saveScrollPosition, updateOddsInStore } from '../helpers';
+import { dateTimeFormat, formatToPercent, retrieveScrollPosition, retrieveSelectedOdds, saveScrollPosition, saveSelectedOdd, updateOddsInStore } from '../helpers';
 import { useMatches } from '../hooks/useMatches';
 import { useMockedWsServer } from '../hooks/useMockedWsServer';
-import type { Match, OddsChangeEventDetailType } from '../types';
+import type { Match, Odds, OddsChangeEventDetailType } from '../types';
 
 export const MatchesTable = () => {
   const [matches, setMatches] = useMatches()
+
+  const [selectedOdds, setSelectedOdds] = useState(retrieveSelectedOdds)
 
   const onOddsChange = useCallback(({ changedOdds, id }: OddsChangeEventDetailType) => {
     updateOddsInStore(changedOdds, id).then(() => {
@@ -39,6 +41,8 @@ export const MatchesTable = () => {
     }
   }, [])
 
+  const handleOddClick = useCallback((id: string, oddType: keyof Odds) => setSelectedOdds(saveSelectedOdd(id, oddType)), [])
+
   const cellRenderer = useCallback<TableCellRenderer>((props) => {
     switch (props.dataKey) {
       case 'sport': return <img src={new URL(`../assets/${props.rowData.sport}.svg`, import.meta.url).href} className="h-full" />
@@ -57,16 +61,25 @@ export const MatchesTable = () => {
         const change = (changedOdd - odd) / odd
         const changePercentStr = formatToPercent(change)
 
+        const selectedOdd = selectedOdds ? selectedOdds[props.rowData.id] : undefined
+
         return <div className="pr-4">
-          <div className={`flex gap-4 px-1`} style={{ backgroundColor: change > 0 ? '#24b548cf' : '#e67e8ecf' }}>
+          <div
+            className={`flex items-center gap-4 px-1 cursor-pointer hover:!bg-sky-400 transition-colors duration-200`}
+            style={{
+              backgroundColor: change > 0 ? '#24b548cf' : '#e67e8ecf',
+              border: `${selectedOdd === props.dataKey ? '3px solid black' : 'none'}`
+            }}
+            onClick={() => handleOddClick(props.rowData.id, props.dataKey as keyof Odds)}
+          >
             <p className="w-full" title={String(changedOdd)}>{changedOdd}</p>
-            <p className="w-full" title={changePercentStr}>{changePercentStr}</p>
+            <p className="w-full text-xs" title={changePercentStr}>{changePercentStr}</p>
           </div>
         </div>
       }
       default: return defaultTableCellRenderer(props)
     }
-  }, [])
+  }, [selectedOdds, handleOddClick])
 
   const columnProps = useMemo(() => ({
     headerRenderer: defaultTableHeaderRenderer,

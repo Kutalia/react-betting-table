@@ -1,8 +1,18 @@
 # React Betting Table
 
-Render a scalable table containing odds about randomly generated matches. Odds keep changing using a loosely mocked WebSocket server based on EventTarget.
+Renders a scalable table containing odds about randomly generated matches. Odds keep changing using a loosely mocked WebSocket server based on EventTarget
+
+Match odds and scores are based on real statistics (like average goals per team during a Champions League). Heuristics are created by me, mostly based on `Math.random()`
+
+Additionally, users are able to select odds. Only single odd type selection is allowed per match
+
+All data is persisted during page refresh thanks to IndexedDB and Localstorage
+
+## Used technologies worth mentioning
 
 Based on [React-Virtualized](https://github.com/bvaughn/react-virtualized)
+
+[Worker Timers](https://www.npmjs.com/package/worker-timers) for keeping data updated even in background
 
 Assets from [Reshot](https://www.reshot.com)
 

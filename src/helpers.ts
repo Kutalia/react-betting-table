@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
 import { openDB } from 'idb'
-import { AVERAGE_SCORE_BY_SPORT, DB_NAME, NUMBER_OF_MATCHES, SCORE_DEVIATION_MULTIPLIER, SCROLL_POSITION_STORE_KEY, STORE_NAME } from './constants'
+import { AVERAGE_SCORE_BY_SPORT, DB_NAME, NUMBER_OF_MATCHES, SCORE_DEVIATION_MULTIPLIER, SCROLL_POSITION_STORE_KEY, SELECTED_ODDS_STORE_KEY, STORE_NAME } from './constants'
 import mlbClubs from './data/clubs.mlb.json'
 import nbaClubs from './data/clubs.nba.json'
 import nflClubs from './data/clubs.nfl.json'
@@ -194,3 +194,26 @@ const percentFormat = new Intl.NumberFormat('en-US', {
 })
 
 export const formatToPercent = (num: number) => percentFormat.format(num)
+
+export const retrieveSelectedOdds = (): Record<string, keyof Odds | null> | undefined => {
+  const selectedOddsStr = localStorage.getItem(SELECTED_ODDS_STORE_KEY)
+  return selectedOddsStr ? JSON.parse(selectedOddsStr) : undefined
+}
+
+export const saveSelectedOdd = (id: string, oddType: keyof Odds) => {
+  const selectedOdds = retrieveSelectedOdds()
+
+  let newOdds: Record<string, keyof Odds | null> = { [id]: oddType }
+
+  if (selectedOdds) {
+    if (selectedOdds[id] === oddType) { // Cancel selection if already selected
+      newOdds = { ...selectedOdds, [id]: null }
+    } else {
+      newOdds = { ...selectedOdds, ...newOdds }
+    }
+  }
+
+  localStorage.setItem(SELECTED_ODDS_STORE_KEY, JSON.stringify(newOdds))
+
+  return newOdds
+}
